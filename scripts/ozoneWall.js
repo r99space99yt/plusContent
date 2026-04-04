@@ -1,6 +1,6 @@
 // scripts/ozoneWall.js
 
-const OzoneWall = extend(Wall, "erekirplus-ozone-wall", {
+const OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
     canPlaceOn(tile){
         if(tile == null) return false;
