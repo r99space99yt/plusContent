@@ -2,7 +2,7 @@ Events.on(ContentInitEvent, function(){
 
     print("ozone wall loading");
 
-    const OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
+    OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
         canPlaceOn(tile){
             if(tile == null) return false;
@@ -68,5 +68,9 @@ Events.on(ContentInitEvent, function(){
     OzoneWall.size = 2;
     OzoneWall.category = Category.defense;
 
+    OzoneWall.buildVisibility = BuildVisibility.shown;
+    OzoneWall.alwaysUnlocked = true;
+    OzoneWall.inEditor = true; // important for sandbox
+    
     print("ozone wall fully created");
 });
