@@ -123,7 +123,6 @@ const OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
 // --- STATIC PROPERTIES ---
 OzoneWall.liquidCapacity = 20;
-OzoneWall.liquidFilter = Liquids.ozone;
 
 OzoneWall.consumesPower = true;
 OzoneWall.powerConsumption = 2;
