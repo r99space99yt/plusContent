@@ -1,0 +1,8 @@
+type: wall
+requirements: [
+  copper 120
+  lead 80
+]
+category: defense
+health: 2000
+size: 2
