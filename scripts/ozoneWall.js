@@ -1,10 +1,8 @@
 Events.on(ContentInitEvent, function(){
 
-    print("ozone wall loaded in");
+    print("ozone wall loading");
 
-    const OzoneWall = Vars.content.getByName(ContentType.block, "pluscontent-ozone-wall");
-
-    Object.assign(OzoneWall, {
+    const OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
         canPlaceOn(tile){
             if(tile == null) return false;
@@ -22,17 +20,11 @@ Events.on(ContentInitEvent, function(){
         update(tile){
             if(tile == null) return;
 
-            var ozoneAmount = 0;
-            if(tile.liquids != null){
-                ozoneAmount = tile.liquids.get(Liquids.ozone);
-            }
+            var ozoneAmount = tile.liquids != null ? tile.liquids.get(Liquids.ozone) : 0;
 
             var hasPower = false;
             if(tile.power != null){
-                var p = tile.power.status;
-                if(p > 0.0001){
-                    hasPower = true;
-                }
+                hasPower = tile.power.status > 0.0001;
             }
 
             if(ozoneAmount > 0 && hasPower){
@@ -65,12 +57,16 @@ Events.on(ContentInitEvent, function(){
         }
     });
 
-    // static props
+    // PROPERTIES
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 20;
 
     OzoneWall.consumesPower = true;
     OzoneWall.powerConsumption = 2;
 
-    print("ozone wall patched");
+    OzoneWall.health = 2000;
+    OzoneWall.size = 2;
+    OzoneWall.category = Category.defense;
+
+    print("ozone wall fully created");
 });
