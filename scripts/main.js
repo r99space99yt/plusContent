@@ -1,2 +1,2 @@
-print('loader started')
+print('loader started');
 require('ozoneWall')
