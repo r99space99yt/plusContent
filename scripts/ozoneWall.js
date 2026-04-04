@@ -6,14 +6,14 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
-        // ✅ REQUIRED: custom build behavior
+        // ✅ REQUIRED build type
         buildType: () => extend(Wall.WallBuild, {
 
             updateTile(){
                 this.super$updateTile();
 
-                var ozoneAmount = this.liquids != null ? this.liquids.get(Liquids.ozone) : 0;
-                var hasPower = this.power != null && this.power.status > 0.0001;
+                var ozoneAmount = this.liquids ? this.liquids.get(Liquids.ozone) : 0;
+                var hasPower = this.power && this.power.status > 0.0001;
 
                 if(ozoneAmount <= 0 || !hasPower) return;
 
@@ -40,7 +40,7 @@ Events.on(ContentInitEvent, function(){
             draw(){
                 this.super$draw();
 
-                // draw smaller (2x2 look)
+                // smaller visual (2x2 look)
                 Draw.rect(
                     Core.atlas.find("pluscontent-ozone-wall"),
                     this.x,
@@ -53,7 +53,7 @@ Events.on(ContentInitEvent, function(){
     });
 
     // =========================
-    // 🔧 PROPERTIES
+    // 🔧 FIXED PROPERTIES
     // =========================
 
     OzoneWall.size = 4;
@@ -67,15 +67,16 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall.buildTime = 120;
 
-    // ✅ FIX: proper liquid support
+    // 🔥 THIS FIXES "-1 capacity"
     OzoneWall.hasLiquids = true;
+    OzoneWall.liquidCapacity = 40;
 
-    // ✅ FIX: proper power system
+    // 🔥 POWER FIX
     OzoneWall.hasPower = true;
     OzoneWall.consumesPower = true;
     OzoneWall.powerConsumption = 3;
 
-    // ❗ IMPORTANT: allow placement without connections
+    // 🔥 ALLOW PLACEMENT ANYWHERE
     OzoneWall.envEnabled = Env.any;
 
     OzoneWall.buildVisibility = BuildVisibility.shown;
