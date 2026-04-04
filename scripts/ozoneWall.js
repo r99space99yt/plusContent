@@ -2,7 +2,7 @@ Events.on(ContentInitEvent, function(){
 
     print("ozone wall loading");
 
-    OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
+    var OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
         canPlaceOn(tile){
             if(tile == null) return false;
