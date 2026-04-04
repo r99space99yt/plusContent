@@ -6,79 +6,50 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
-        // ✅ DRAW 4x4 PREVIEW (does NOT break placement)
-        drawPlace(x, y, rotation, valid){
-            this.super$drawPlace(x, y, rotation, valid);
+        // ✅ CUSTOM DRAW (looks like 2x2 but block is 4x4)
+        draw(tile){
+            this.super$draw(tile);
 
-            Draw.color(valid ? Color.green : Color.red);
-            Lines.stroke(1);
-
-            var worldx = x * Vars.tilesize;
-            var worldy = y * Vars.tilesize;
-
-            Lines.rect(
-                worldx,
-                worldy,
-                Vars.tilesize * 4,
-                Vars.tilesize * 4
+            Draw.rect(
+                Core.atlas.find("pluscontent-ozone-wall"),
+                tile.worldx(),
+                tile.worldy(),
+                Vars.tilesize * 2,
+                Vars.tilesize * 2
             );
-
-            Draw.reset();
         },
 
-        // ✅ MAIN LOGIC
+        // ✅ MAIN LOGIC (optimized)
         update(tile){
             if(tile == null) return;
 
-            // --- check 4x4 space (soft check, DOES NOT block placement) ---
-            for(var dx = 0; dx < 4; dx++){
-                for(var dy = 0; dy < 4; dy++){
-                    var t = Vars.world.tile(tile.x + dx, tile.y + dy);
-                    if(t == null) return;
-
-                    if(t.build != null && t.build != tile.build){
-                        return; // disable effect if blocked
-                    }
-                }
-            }
-
-            // --- ozone ---
             var ozoneAmount = tile.liquids != null ? tile.liquids.get(Liquids.ozone) : 0;
 
-            // --- power ---
-            var hasPower = false;
-            if(tile.power != null){
-                hasPower = tile.power.status > 0.0001;
-            }
+            var hasPower = tile.power != null && tile.power.status > 0.0001;
 
-            if(ozoneAmount > 0 && hasPower){
+            if(ozoneAmount <= 0 || !hasPower) return;
 
-                // consume ozone
-                tile.liquids.remove(Liquids.ozone, 0.05);
+            // consume ozone
+            tile.liquids.remove(Liquids.ozone, 0.05);
 
-                var cx = (tile.x + 2) * Vars.tilesize;
-                var cy = (tile.y + 2) * Vars.tilesize;
+            var cx = tile.worldx();
+            var cy = tile.worldy();
 
-                Units.near(cx, cy, 60, function(u){
+            // slightly bigger range for 4x4
+            Units.near(cx, cy, 80, function(u){
 
-                    var utx = Math.floor(u.x / Vars.tilesize);
-                    var uty = Math.floor(u.y / Vars.tilesize);
+                var dx = u.x - cx;
+                var dy = u.y - cy;
+                var dist = Math.sqrt(dx*dx + dy*dy);
 
-                    if(utx >= tile.x && utx < tile.x + 4 &&
-                       uty >= tile.y && uty < tile.y + 4){
+                if(dist > 0 && dist < 64){
 
-                        var dx = u.x - cx;
-                        var dy = u.y - cy;
-                        var dist = Math.sqrt(dx*dx + dy*dy);
+                    var push = 0.05 * ozoneAmount;
 
-                        if(dist > 0){
-                            var push = 0.05 * ozoneAmount;
-                            u.vel.x += dx / dist * push;
-                            u.vel.y += dy / dist * push;
-                        }
-                    }
-                });
-            }
+                    u.vel.x += dx / dist * push;
+                    u.vel.y += dy / dist * push;
+                }
+            });
         }
     });
 
@@ -86,27 +57,27 @@ Events.on(ContentInitEvent, function(){
     // 🔧 PROPERTIES
     // =========================
 
-    OzoneWall.size = 2;
-    OzoneWall.health = 2000;
+    OzoneWall.size = 4; // 🔥 REAL SIZE
+    OzoneWall.health = 4000;
     OzoneWall.category = Category.defense;
 
-    // ✅ REQUIRED FOR MENU
+    // ✅ BUILD COST
     OzoneWall.requirements = ItemStack.with(
-        Items.copper, 120,
-        Items.lead, 80
+        Items.copper, 200,
+        Items.lead, 150
     );
 
-    // ✅ BUILD TIME FIX
-    OzoneWall.buildTime = 60;
+    // ✅ BUILD TIME
+    OzoneWall.buildTime = 120;
 
-    // ✅ LIQUID
+    // ✅ LIQUID SYSTEM
     OzoneWall.hasLiquids = true;
-    OzoneWall.liquidCapacity = 20;
+    OzoneWall.liquidCapacity = 40;
     OzoneWall.outputsLiquid = false;
 
-    // ✅ POWER
+    // ✅ POWER SYSTEM
     OzoneWall.consumesPower = true;
-    OzoneWall.powerConsumption = 2;
+    OzoneWall.powerConsumption = 3;
 
     // ✅ VISIBILITY
     OzoneWall.buildVisibility = BuildVisibility.shown;
