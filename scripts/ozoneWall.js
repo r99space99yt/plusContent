@@ -6,30 +6,46 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
-        // ✅ 4x4 placement check (fixed)
-        canPlaceOn(tile){
-            if(tile == null) return false;
+        // ✅ DRAW 4x4 PREVIEW (does NOT break placement)
+        drawPlace(x, y, rotation, valid){
+            this.super$drawPlace(x, y, rotation, valid);
 
-            for(var dx = 0; dx < 4; dx++){
-                for(var dy = 0; dy < 4; dy++){
-                    var t = Vars.world.tile(tile.x + dx, tile.y + dy);
-                    if(t == null) return false;
+            Draw.color(valid ? Color.green : Color.red);
+            Lines.stroke(1);
 
-                    // allow empty OR itself
-                    if(t.build != null && t.build.block != this){
-                        return false;
-                    }
-                }
-            }
-            return true;
+            var worldx = x * Vars.tilesize;
+            var worldy = y * Vars.tilesize;
+
+            Lines.rect(
+                worldx,
+                worldy,
+                Vars.tilesize * 4,
+                Vars.tilesize * 4
+            );
+
+            Draw.reset();
         },
 
-        // ✅ push enemies if ozone + power
+        // ✅ MAIN LOGIC
         update(tile){
             if(tile == null) return;
 
+            // --- check 4x4 space (soft check, DOES NOT block placement) ---
+            for(var dx = 0; dx < 4; dx++){
+                for(var dy = 0; dy < 4; dy++){
+                    var t = Vars.world.tile(tile.x + dx, tile.y + dy);
+                    if(t == null) return;
+
+                    if(t.build != null && t.build != tile.build){
+                        return; // disable effect if blocked
+                    }
+                }
+            }
+
+            // --- ozone ---
             var ozoneAmount = tile.liquids != null ? tile.liquids.get(Liquids.ozone) : 0;
 
+            // --- power ---
             var hasPower = false;
             if(tile.power != null){
                 hasPower = tile.power.status > 0.0001;
@@ -74,21 +90,21 @@ Events.on(ContentInitEvent, function(){
     OzoneWall.health = 2000;
     OzoneWall.category = Category.defense;
 
-    // ✅ REQUIRED for build menu
+    // ✅ REQUIRED FOR MENU
     OzoneWall.requirements = ItemStack.with(
         Items.copper, 120,
         Items.lead, 80
     );
 
-    // ✅ FIX negative build time
+    // ✅ BUILD TIME FIX
     OzoneWall.buildTime = 60;
 
-    // ✅ LIQUID SYSTEM
+    // ✅ LIQUID
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 20;
     OzoneWall.outputsLiquid = false;
 
-    // ✅ POWER SYSTEM
+    // ✅ POWER
     OzoneWall.consumesPower = true;
     OzoneWall.powerConsumption = 2;
 
