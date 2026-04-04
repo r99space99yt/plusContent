@@ -6,24 +6,16 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
-        // ✅ REQUIRED BUILD TYPE
         buildType: () => extend(Wall.WallBuild, {
-
-            // ✅ ONLY ACCEPT OZONE (FIXES CRASH)
-            acceptLiquid(source, liquid){
-                return liquid == Liquids.ozone;
-            },
 
             updateTile(){
                 this.super$updateTile();
 
+                // read ozone safely
                 var ozoneAmount = this.liquids ? this.liquids.get(Liquids.ozone) : 0;
                 var hasPower = this.power && this.power.status > 0.0001;
 
                 if(ozoneAmount <= 0 || !hasPower) return;
-
-                // consume ozone
-                this.liquids.remove(Liquids.ozone, 0.05);
 
                 var cx = this.x;
                 var cy = this.y;
@@ -42,10 +34,10 @@ Events.on(ContentInitEvent, function(){
                 });
             },
 
-            // ✅ DRAW SMALLER (2x2 LOOK)
             draw(){
                 this.super$draw();
 
+                // draw smaller (2x2 look)
                 Draw.rect(
                     Core.atlas.find("pluscontent-ozone-wall"),
                     this.x,
@@ -73,18 +65,29 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall.buildTime = 120;
 
-    // ✅ LIQUID SYSTEM (FIXED)
+    // =========================
+    // 💧 LIQUID SYSTEM (FIXED)
+    // =========================
+
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 40;
 
-    // ✅ POWER SYSTEM (FIXED)
+    // 🔥 THIS LINE FIXES YOUR CRASH
+    OzoneWall.consumeLiquid(Liquids.ozone, 0.05);
+
+    // =========================
+    // ⚡ POWER SYSTEM (FIXED)
+    // =========================
+
     OzoneWall.hasPower = true;
     OzoneWall.consumePower(3);
 
-    // ✅ ALLOW EVERYWHERE
+    // =========================
+    // 🌍 ENV + VISIBILITY
+    // =========================
+
     OzoneWall.envEnabled = Env.any;
 
-    // ✅ VISIBILITY
     OzoneWall.buildVisibility = BuildVisibility.shown;
     OzoneWall.alwaysUnlocked = true;
 
