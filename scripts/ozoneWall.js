@@ -6,8 +6,13 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
-        // ✅ REQUIRED build type
+        // ✅ REQUIRED BUILD TYPE
         buildType: () => extend(Wall.WallBuild, {
+
+            // ✅ ONLY ACCEPT OZONE (FIXES CRASH)
+            acceptLiquid(source, liquid){
+                return liquid == Liquids.ozone;
+            },
 
             updateTile(){
                 this.super$updateTile();
@@ -37,10 +42,10 @@ Events.on(ContentInitEvent, function(){
                 });
             },
 
+            // ✅ DRAW SMALLER (2x2 LOOK)
             draw(){
                 this.super$draw();
 
-                // smaller visual (2x2 look)
                 Draw.rect(
                     Core.atlas.find("pluscontent-ozone-wall"),
                     this.x,
@@ -53,13 +58,14 @@ Events.on(ContentInitEvent, function(){
     });
 
     // =========================
-    // 🔧 FIXED PROPERTIES
+    // 🔧 PROPERTIES
     // =========================
 
     OzoneWall.size = 4;
     OzoneWall.health = 4000;
     OzoneWall.category = Category.defense;
 
+    // ✅ BUILD COST
     OzoneWall.requirements = ItemStack.with(
         Items.copper, 200,
         Items.lead, 150
@@ -67,18 +73,18 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall.buildTime = 120;
 
-    // 🔥 THIS FIXES "-1 capacity"
+    // ✅ LIQUID SYSTEM (FIXED)
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 40;
 
-    // 🔥 POWER FIX
+    // ✅ POWER SYSTEM (FIXED)
     OzoneWall.hasPower = true;
-    OzoneWall.consumesPower = true;
-    OzoneWall.powerConsumption = 3;
+    OzoneWall.consumePower(3);
 
-    // 🔥 ALLOW PLACEMENT ANYWHERE
+    // ✅ ALLOW EVERYWHERE
     OzoneWall.envEnabled = Env.any;
 
+    // ✅ VISIBILITY
     OzoneWall.buildVisibility = BuildVisibility.shown;
     OzoneWall.alwaysUnlocked = true;
 
