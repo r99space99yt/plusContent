@@ -103,7 +103,7 @@ const OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
             Draw.color(Color.cyan, Color.white, ozoneAmount / 20);
 
             // --- SAFE REGION ---
-            var region = Core.atlas.find("erekirplus-ozone-wall");
+            var region = Core.atlas.find("pluscontent-ozone-wall");
 
             if(region != null){
                 Draw.rect(
