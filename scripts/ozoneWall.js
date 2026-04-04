@@ -1,8 +1,10 @@
+var OzoneWall; // 🔥 REQUIRED (fixes your crash)
+
 Events.on(ContentInitEvent, function(){
 
     print("ozone wall loading");
 
-    var OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
+    OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
         canPlaceOn(tile){
             if(tile == null) return false;
@@ -57,7 +59,7 @@ Events.on(ContentInitEvent, function(){
         }
     });
 
-    // PROPERTIES
+    // ✅ REQUIRED PROPERTIES
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 20;
 
@@ -68,9 +70,15 @@ Events.on(ContentInitEvent, function(){
     OzoneWall.size = 2;
     OzoneWall.category = Category.defense;
 
+    // 🔥 THIS WAS YOUR MISSING PIECE BEFORE
+    OzoneWall.requirements = ItemStack.with(
+        Items.copper, 120,
+        Items.lead, 80
+    );
+
     OzoneWall.buildVisibility = BuildVisibility.shown;
     OzoneWall.alwaysUnlocked = true;
-    OzoneWall.inEditor = true; // important for sandbox
-    
+    OzoneWall.inEditor = true;
+
     print("ozone wall fully created");
 });
