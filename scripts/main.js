@@ -1,0 +1,1 @@
+print('loader started(even tho no scripts)')
