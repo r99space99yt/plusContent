@@ -1,1 +1,2 @@
-print('loader started(even tho no scripts)')
+print('loader started')
+require('ozoneWall')
