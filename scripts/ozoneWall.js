@@ -2,20 +2,26 @@ var OzoneWall;
 
 Events.on(ContentInitEvent, function(){
 
-    print("ozone wall loading");
-
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
         buildType: () => extend(Wall.WallBuild, {
 
+            acceptLiquid(source, liquid){
+                return liquid === Liquids.ozone;
+            },
+
             updateTile(){
                 this.super$updateTile();
 
-                // read ozone safely
-                var ozoneAmount = this.liquids ? this.liquids.get(Liquids.ozone) : 0;
+                if(this.liquids == null) return;
+
+                var ozoneAmount = this.liquids.get(Liquids.ozone);
                 var hasPower = this.power && this.power.status > 0.0001;
 
                 if(ozoneAmount <= 0 || !hasPower) return;
+
+                // manual consume
+                this.liquids.remove(Liquids.ozone, 0.05);
 
                 var cx = this.x;
                 var cy = this.y;
@@ -32,32 +38,16 @@ Events.on(ContentInitEvent, function(){
                         u.vel.y += dy / dist * push;
                     }
                 });
-            },
-
-            draw(){
-                this.super$draw();
-
-                // draw smaller (2x2 look)
-                Draw.rect(
-                    Core.atlas.find("pluscontent-ozone-wall"),
-                    this.x,
-                    this.y,
-                    Vars.tilesize * 2,
-                    Vars.tilesize * 2
-                );
             }
         })
     });
 
-    // =========================
-    // 🔧 PROPERTIES
-    // =========================
+    // ===== PROPERTIES =====
 
     OzoneWall.size = 4;
     OzoneWall.health = 4000;
     OzoneWall.category = Category.defense;
 
-    // ✅ BUILD COST
     OzoneWall.requirements = ItemStack.with(
         Items.copper, 200,
         Items.lead, 150
@@ -65,31 +55,18 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall.buildTime = 120;
 
-    // =========================
-    // 💧 LIQUID SYSTEM (FIXED)
-    // =========================
-
+    // 💧 LIQUID (FIXED)
     OzoneWall.hasLiquids = true;
     OzoneWall.liquidCapacity = 40;
 
-    // 🔥 THIS LINE FIXES YOUR CRASH
-    OzoneWall.consumeLiquid(Liquids.ozone, 0.05);
+    // 🔥 CRITICAL FIX
+    OzoneWall.consumeLiquid(Liquids.ozone, 0.000001);
 
-    // =========================
-    // ⚡ POWER SYSTEM (FIXED)
-    // =========================
-
+    // ⚡ POWER
     OzoneWall.hasPower = true;
     OzoneWall.consumePower(3);
 
-    // =========================
-    // 🌍 ENV + VISIBILITY
-    // =========================
-
     OzoneWall.envEnabled = Env.any;
-
     OzoneWall.buildVisibility = BuildVisibility.shown;
     OzoneWall.alwaysUnlocked = true;
-
-    print("ozone wall fully created");
 });
