@@ -1,4 +1,4 @@
-var OzoneWall; // 🔥 REQUIRED (fixes your crash)
+var OzoneWall;
 
 Events.on(ContentInitEvent, function(){
 
@@ -6,6 +6,7 @@ Events.on(ContentInitEvent, function(){
 
     OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
 
+        // ✅ 4x4 placement check (fixed)
         canPlaceOn(tile){
             if(tile == null) return false;
 
@@ -13,12 +14,17 @@ Events.on(ContentInitEvent, function(){
                 for(var dy = 0; dy < 4; dy++){
                     var t = Vars.world.tile(tile.x + dx, tile.y + dy);
                     if(t == null) return false;
-                    if(t.block() != Blocks.air) return false;
+
+                    // allow empty OR itself
+                    if(t.build != null && t.build.block != this){
+                        return false;
+                    }
                 }
             }
             return true;
         },
 
+        // ✅ push enemies if ozone + power
         update(tile){
             if(tile == null) return;
 
@@ -31,6 +37,7 @@ Events.on(ContentInitEvent, function(){
 
             if(ozoneAmount > 0 && hasPower){
 
+                // consume ozone
                 tile.liquids.remove(Liquids.ozone, 0.05);
 
                 var cx = (tile.x + 2) * Vars.tilesize;
@@ -59,23 +66,33 @@ Events.on(ContentInitEvent, function(){
         }
     });
 
-    // ✅ REQUIRED PROPERTIES
-    OzoneWall.hasLiquids = true;
-    OzoneWall.liquidCapacity = 20;
+    // =========================
+    // 🔧 PROPERTIES
+    // =========================
 
-    OzoneWall.consumesPower = true;
-    OzoneWall.powerConsumption = 2;
-
-    OzoneWall.health = 2000;
     OzoneWall.size = 2;
+    OzoneWall.health = 2000;
     OzoneWall.category = Category.defense;
 
-    // 🔥 THIS WAS YOUR MISSING PIECE BEFORE
+    // ✅ REQUIRED for build menu
     OzoneWall.requirements = ItemStack.with(
         Items.copper, 120,
         Items.lead, 80
     );
 
+    // ✅ FIX negative build time
+    OzoneWall.buildTime = 60;
+
+    // ✅ LIQUID SYSTEM
+    OzoneWall.hasLiquids = true;
+    OzoneWall.liquidCapacity = 20;
+    OzoneWall.outputsLiquid = false;
+
+    // ✅ POWER SYSTEM
+    OzoneWall.consumesPower = true;
+    OzoneWall.powerConsumption = 2;
+
+    // ✅ VISIBILITY
     OzoneWall.buildVisibility = BuildVisibility.shown;
     OzoneWall.alwaysUnlocked = true;
     OzoneWall.inEditor = true;
