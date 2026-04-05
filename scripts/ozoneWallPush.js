@@ -1,3 +1,4 @@
+require('ozoneWall');
 print("Ozone Shield Push Script Started");
 
 // Utility wrapper for Mindustry JS
