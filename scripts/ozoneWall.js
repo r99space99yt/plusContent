@@ -21,72 +21,11 @@ Events.on(ContentInitEvent, function(){
         description: "Pushes enemies and bullets in a 5x5 area when powered.",
 
         buildType: () => extend(PowerBlock.PowerBuild, {
-            updateTile(){
-                this.super$updateTile();
-
-                if(!this.power || this.power.status <= 0.0001) return;
-
-                var cx = this.x;
-                var cy = this.y;
-
-                var centerX = cx*8 + 12;
-                var centerY = cy*8 + 12;
-                var shieldRadius = 5;
-                var pushStrength = 1.2;
-                var maxSpeed = 300;
-
-                Groups.unit.intersect(
-                    centerX - shieldRadius*8,
-                    centerY - shieldRadius*8,
-                    shieldRadius*16,
-                    shieldRadius*16,
-                    cons(function(u){
-                        if(!u || u.dead) return;
-                        var dx = u.x - centerX;
-                        var dy = u.y - centerY;
-                        var dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < 1) return;
-                        var nx = dx / dist;
-                        var ny = dy / dist;
-                        var vx = u.vel.x + nx * pushStrength;
-                        var vy = u.vel.y + ny * pushStrength;
-                        var speed = Math.sqrt(vx*vx + vy*vy);
-                        if(speed > maxSpeed){
-                            vx = vx / speed * maxSpeed;
-                            vy = vy / speed * maxSpeed;
-                        }
-                        u.vel.set(vx, vy);
-                    })
-                );
-
-                Groups.bullet.intersect(
-                    centerX - shieldRadius*8,
-                    centerY - shieldRadius*8,
-                    shieldRadius*16,
-                    shieldRadius*16,
-                    cons(function(b){
-                        if(!b) return;
-                        var dx = b.x - centerX;
-                        var dy = b.y - centerY;
-                        var dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < 1) return;
-                        var nx = dx / dist;
-                        var ny = dy / dist;
-                        var bx = b.vel.x + nx * pushStrength*0.8;
-                        var by = b.vel.y + ny * pushStrength*0.8;
-                        var speed = Math.sqrt(bx*bx + by*by);
-                        if(speed > maxSpeed*2){
-                            bx = bx / speed * maxSpeed*2;
-                            by = by / speed * maxSpeed*2;
-                        }
-                        b.vel.set(bx, by);
-                    })
-                );
-            },
 
             draw(){
                 this.super$draw();
                 if(this.power && this.power.status > 0.0001){
+                    // Draw shield radius
                     Draw.color(Pal.accent);
                     var cx = this.x*8 + 12;
                     var cy = this.y*8 + 12;
@@ -105,10 +44,9 @@ Events.on(ContentInitEvent, function(){
                 }
                 return true;
             }
-
         })
     });
 
-    // Properly call the consumePower method
+    // Set the consumePower amount correctly
     OzoneShieldBlock.consumePower(5);
 });
