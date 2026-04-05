@@ -6,14 +6,16 @@ var OzoneShieldBlock;
 
 Events.on(ContentInitEvent, function() {
 
-    // Create a power block
+    // Create the power block
     OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
-        buildType: () => extend(PowerBlock.PowerBuild, {
-            updateTile() {
-                this.super$updateTile();
-                // The actual push is handled in ozoneWallPush.js
-            }
-        })
+        buildType: function() {
+            return extend(PowerBlock.PowerBuild, {
+                updateTile: function() {
+                    this.super$updateTile();
+                    // Push handled in separate script
+                }
+            });
+        }
     });
 
     // Block properties
@@ -32,9 +34,11 @@ Events.on(ContentInitEvent, function() {
     OzoneShieldBlock.localizedName = "Ozone Shield";
     OzoneShieldBlock.description = "Pushes units and bullets in a 5x5 area when powered.";
 
-    // Power
+    // --- Proper consumes setup ---
     OzoneShieldBlock.hasPower = true;
-    OzoneShieldBlock.consumes.power(3); // correct place for consumes.power
 
-    print("Ozone Shield Block Initialized");
+    // This is the safe place to declare consumes
+    OzoneShieldBlock.consumes.power(3);
+
+    print("Ozone Shield Block Initialized Properly");
 });
