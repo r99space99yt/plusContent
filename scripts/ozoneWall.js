@@ -4,7 +4,8 @@ Events.on(ContentInitEvent, function(){
 
     OzoneShieldBlock = extend(Block, "pluscontent-ozone-shield", {
 
-        originOffset: 0, // fixes 2x2 placement offset
+        size: 2,               // 2x2 tiles
+        originOffset: 0,       // top-left corner anchor
 
         buildType: () => extend(Block.Build, {
 
@@ -16,7 +17,7 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
-                // 4x4 shield area around block
+                // 4x4 push area
                 var shieldSize = 4;
                 var startX = cx - 1;
                 var startY = cy - 1;
@@ -40,7 +41,6 @@ Events.on(ContentInitEvent, function(){
                 });
             },
 
-            // explicit placement check for 2x2 top-left anchor
             canPlaceOn(tile){
                 for(var dx = 0; dx < this.block.size; dx++){
                     for(var dy = 0; dy < this.block.size; dy++){
@@ -49,11 +49,16 @@ Events.on(ContentInitEvent, function(){
                     }
                 }
                 return true;
+            },
+
+            // optional: shift drawing to match 2x2 tiles
+            draw(){
+                Draw.rect(this.block.region, this.x + 1, this.y + 1); // +1 shifts sprite to top-left
             }
+
         })
     });
 
-    OzoneShieldBlock.size = 2;
     OzoneShieldBlock.health = 4000;
     OzoneShieldBlock.category = Category.defense;
 
