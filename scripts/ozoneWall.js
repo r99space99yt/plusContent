@@ -3,29 +3,29 @@
 print("Ozone Shield Block Script Started");
 
 // ozoneWall.js
-const OzoneShieldBlock = extend(PowerBlock, "ozone-shield", {
-    // Build type defines the behavior of each placed block
+
+const OzoneWall = extend(PowerBlock, "ozone-wall", {
+    size: 2,
+    health: 600,
+    requirements: ItemStack.with(Items.copper, 50, Items.graphite, 30),
+    category: Category.effect,
+    buildVisibility: BuildVisibility.shown,
+
+    consumes: [Consume.power(3)],
+
     buildType: function () {
         return extend(PowerBlock.PowerBuild, {
             updateTile: function () {
                 this.super$updateTile();
 
-                // Only push if block has power
+                // Only do something if block has power
                 if (this.power.status > 0) {
-                    // Call the separate push logic
-                    OzonePushLogic.push(this);
+                    // Call the push logic from the separate script
+                    if (typeof OzonePushLogic !== "undefined") {
+                        OzonePushLogic.push(this);
+                    }
                 }
             }
         });
-    },
-
-    // Set block stats
-    health: 600,
-    size: 2,
-    requirements: ItemStack.with(Items.copper, 50, Items.graphite, 30),
-    category: Category.effect,
-    buildVisibility: BuildVisibility.shown,
-
-    // Proper way to declare power consumption
-    consumes: [Consume.power(3)]
+    }
 });
