@@ -9,32 +9,27 @@ Events.on(ContentInitEvent, function(){
             updateTile(){
                 this.super$updateTile();
 
-                // Only push if powered
                 if(!this.power || this.power.status <= 0.0001) return;
 
                 var cx = this.x;
                 var cy = this.y;
 
-                // Shield size = 4x4 tiles around block
-                var shieldSize = 4; 
-                var halfShield = shieldSize / 2;
-
-                // Get shield area coordinates
-                var startX = cx - 1; // 2x2 block center ~ push area
+                var shieldSize = 4;
+                var startX = cx - 1;
                 var startY = cy - 1;
+                var endX = startX + shieldSize;
+                var endY = startY + shieldSize;
 
-                Units.near(cx*8, cy*8, shieldSize*8, function(u){
-                    // Check if unit is inside 4x4 shield square
-                    if(u.x >= startX*8 && u.x <= (startX + shieldSize)*8 &&
-                       u.y >= startY*8 && u.y <= (startY + shieldSize)*8){
+                Units.near(cx*8, cy*8, 32, function(u){
+                    var ux = u.x / 8;
+                    var uy = u.y / 8;
 
-                        // Push unit away from block center
-                        var dx = u.x - (cx*8 + 4); // center offset
-                        var dy = u.y - (cy*8 + 4);
+                    if(ux >= startX && ux <= endX && uy >= startY && uy <= endY){
+                        var dx = u.x - (cx*8 + 8);
+                        var dy = u.y - (cy*8 + 8);
                         var dist = Math.sqrt(dx*dx + dy*dy);
-
                         if(dist > 0){
-                            var push = 0.2; // adjust push strength
+                            var push = 0.2;
                             u.vel.x += dx / dist * push;
                             u.vel.y += dy / dist * push;
                         }
@@ -45,7 +40,7 @@ Events.on(ContentInitEvent, function(){
     });
 
     // ===== PROPERTIES =====
-    OzoneBlock.size = 2; // 2x2 block
+    OzoneBlock.size = 2;
     OzoneBlock.health = 4000;
     OzoneBlock.category = Category.defense;
 
@@ -60,6 +55,9 @@ Events.on(ContentInitEvent, function(){
     OzoneBlock.hasPower = true;
     OzoneBlock.consumePower(3);
 
+    // ✅ Make it placable anywhere
     OzoneBlock.buildVisibility = BuildVisibility.shown;
     OzoneBlock.alwaysUnlocked = true;
+    OzoneBlock.envEnabled = Env.any; // THIS is important
+    print("Loaded wall");
 });
