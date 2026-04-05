@@ -1,2 +1,3 @@
 print('loader started');
-require('ozoneWall')
+require('ozoneWall');
+require('ozoneWallPush');
