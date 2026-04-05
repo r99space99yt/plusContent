@@ -2,7 +2,8 @@
 
 print("Ozone Shield Block Script Started");
 
-// ozoneWall.js
+const Consume = require("mindustry/world/consumers/Consume"); // optional in some JS setups
+const ConsumePower = require("mindustry/world/consumers/ConsumePower"); 
 
 const OzoneWall = extend(PowerBlock, "ozone-wall", {
     size: 2,
@@ -11,16 +12,14 @@ const OzoneWall = extend(PowerBlock, "ozone-wall", {
     category: Category.effect,
     buildVisibility: BuildVisibility.shown,
 
-    consumes: [Consume.power(3)],
+    consumes: [new ConsumePower(3)], // <-- fixed
 
     buildType: function () {
         return extend(PowerBlock.PowerBuild, {
             updateTile: function () {
                 this.super$updateTile();
 
-                // Only do something if block has power
                 if (this.power.status > 0) {
-                    // Call the push logic from the separate script
                     if (typeof OzonePushLogic !== "undefined") {
                         OzonePushLogic.push(this);
                     }
