@@ -9,6 +9,7 @@ Events.on(ContentInitEvent, function(){
         buildTime: 120,
         hasPower: true,
         alwaysUnlocked: true,
+        buildVisibility: BuildVisibility.shown,
         envEnabled: Env.any,
 
         requirements: ItemStack.with(
@@ -20,7 +21,6 @@ Events.on(ContentInitEvent, function(){
         description: "Pushes enemies and bullets in a 5x5 area when powered.",
 
         buildType: () => extend(PowerBlock.PowerBuild, {
-
             updateTile(){
                 this.super$updateTile();
 
@@ -29,15 +29,12 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
-                // center of 3x3 block in pixels
                 var centerX = cx*8 + 12;
                 var centerY = cy*8 + 12;
-
-                var shieldRadius = 5; // in tiles
+                var shieldRadius = 5;
                 var pushStrength = 1.2;
                 var maxSpeed = 300;
 
-                // Push units
                 Groups.unit.intersect(
                     centerX - shieldRadius*8,
                     centerY - shieldRadius*8,
@@ -49,23 +46,19 @@ Events.on(ContentInitEvent, function(){
                         var dy = u.y - centerY;
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         if(dist < 1) return;
-
                         var nx = dx / dist;
                         var ny = dy / dist;
                         var vx = u.vel.x + nx * pushStrength;
                         var vy = u.vel.y + ny * pushStrength;
-
                         var speed = Math.sqrt(vx*vx + vy*vy);
                         if(speed > maxSpeed){
                             vx = vx / speed * maxSpeed;
                             vy = vy / speed * maxSpeed;
                         }
-
                         u.vel.set(vx, vy);
                     })
                 );
 
-                // Push bullets
                 Groups.bullet.intersect(
                     centerX - shieldRadius*8,
                     centerY - shieldRadius*8,
@@ -77,18 +70,15 @@ Events.on(ContentInitEvent, function(){
                         var dy = b.y - centerY;
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         if(dist < 1) return;
-
                         var nx = dx / dist;
                         var ny = dy / dist;
                         var bx = b.vel.x + nx * pushStrength*0.8;
                         var by = b.vel.y + ny * pushStrength*0.8;
-
                         var speed = Math.sqrt(bx*bx + by*by);
                         if(speed > maxSpeed*2){
                             bx = bx / speed * maxSpeed*2;
                             by = by / speed * maxSpeed*2;
                         }
-
                         b.vel.set(bx, by);
                     })
                 );
@@ -119,6 +109,6 @@ Events.on(ContentInitEvent, function(){
         })
     });
 
-    // Properly call consumePower method
+    // Properly call the consumePower method
     OzoneShieldBlock.consumePower(5);
 });
