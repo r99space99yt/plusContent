@@ -1,41 +1,43 @@
-var OzoneWall;
+var OzoneBlock;
 
 Events.on(ContentInitEvent, function(){
 
-    OzoneWall = extend(Wall, "pluscontent-ozone-wall", {
+    OzoneBlock = extend(Wall, "pluscontent-ozone-block", {
 
         buildType: () => extend(Wall.WallBuild, {
-
-            acceptLiquid(source, liquid){
-                return liquid === Liquids.ozone;
-            },
 
             updateTile(){
                 this.super$updateTile();
 
-                if(this.liquids == null) return;
-
-                var ozoneAmount = this.liquids.get(Liquids.ozone);
-                var hasPower = this.power && this.power.status > 0.0001;
-
-                if(ozoneAmount <= 0 || !hasPower) return;
-
-                // manual consume
-                this.liquids.remove(Liquids.ozone, 0.05);
+                // Only push if powered
+                if(!this.power || this.power.status <= 0.0001) return;
 
                 var cx = this.x;
                 var cy = this.y;
 
-                Units.near(cx, cy, 80, function(u){
+                // Shield size = 4x4 tiles around block
+                var shieldSize = 4; 
+                var halfShield = shieldSize / 2;
 
-                    var dx = u.x - cx;
-                    var dy = u.y - cy;
-                    var dist = Math.sqrt(dx*dx + dy*dy);
+                // Get shield area coordinates
+                var startX = cx - 1; // 2x2 block center ~ push area
+                var startY = cy - 1;
 
-                    if(dist > 0 && dist < 64){
-                        var push = 0.05 * ozoneAmount;
-                        u.vel.x += dx / dist * push;
-                        u.vel.y += dy / dist * push;
+                Units.near(cx*8, cy*8, shieldSize*8, function(u){
+                    // Check if unit is inside 4x4 shield square
+                    if(u.x >= startX*8 && u.x <= (startX + shieldSize)*8 &&
+                       u.y >= startY*8 && u.y <= (startY + shieldSize)*8){
+
+                        // Push unit away from block center
+                        var dx = u.x - (cx*8 + 4); // center offset
+                        var dy = u.y - (cy*8 + 4);
+                        var dist = Math.sqrt(dx*dx + dy*dy);
+
+                        if(dist > 0){
+                            var push = 0.2; // adjust push strength
+                            u.vel.x += dx / dist * push;
+                            u.vel.y += dy / dist * push;
+                        }
                     }
                 });
             }
@@ -43,30 +45,21 @@ Events.on(ContentInitEvent, function(){
     });
 
     // ===== PROPERTIES =====
+    OzoneBlock.size = 2; // 2x2 block
+    OzoneBlock.health = 4000;
+    OzoneBlock.category = Category.defense;
 
-    OzoneWall.size = 4;
-    OzoneWall.health = 4000;
-    OzoneWall.category = Category.defense;
-
-    OzoneWall.requirements = ItemStack.with(
-        Items.copper, 200,
-        Items.lead, 150
+    OzoneBlock.requirements = ItemStack.with(
+        Items.copper, 150,
+        Items.lead, 100
     );
 
-    OzoneWall.buildTime = 120;
-
-    // 💧 LIQUID (FIXED)
-    OzoneWall.hasLiquids = true;
-    OzoneWall.liquidCapacity = 40;
-
-    // 🔥 CRITICAL FIX
-    OzoneWall.consumeLiquid(Liquids.ozone, 0.000001);
+    OzoneBlock.buildTime = 120;
 
     // ⚡ POWER
-    OzoneWall.hasPower = true;
-    OzoneWall.consumePower(3);
+    OzoneBlock.hasPower = true;
+    OzoneBlock.consumePower(3);
 
-    OzoneWall.envEnabled = Env.any;
-    OzoneWall.buildVisibility = BuildVisibility.shown;
-    OzoneWall.alwaysUnlocked = true;
+    OzoneBlock.buildVisibility = BuildVisibility.shown;
+    OzoneBlock.alwaysUnlocked = true;
 });
