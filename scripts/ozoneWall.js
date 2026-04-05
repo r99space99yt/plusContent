@@ -1,4 +1,5 @@
 // ozoneWall.js — Ozone Shield Block
+
 print("Ozone Shield Block Script Started");
 
 var OzoneShieldBlock;
@@ -11,10 +12,9 @@ Events.on(ContentInitEvent, function() {
 
             updateTile(){
                 this.super$updateTile();
-                // Push logic handled separately in OzoneShieldPush.js
+                // push logic is in separate push script
             },
 
-            // Optional: Can add placement rules if needed
             canPlaceOn(tile){
                 for(var dx = 0; dx < this.block.size; dx++){
                     for(var dy = 0; dy < this.block.size; dy++){
@@ -27,8 +27,8 @@ Events.on(ContentInitEvent, function() {
         })
     });
 
-    // ===== Block Properties =====
-    OzoneShieldBlock.size = 3;  // 3x3 block to match 5x5 push area
+    // Core block properties:
+    OzoneShieldBlock.size = 3;
     OzoneShieldBlock.health = 4000;
     OzoneShieldBlock.category = Category.defense;
 
@@ -39,15 +39,14 @@ Events.on(ContentInitEvent, function() {
 
     OzoneShieldBlock.buildTime = 120;
 
-    // ⚡ Power
+    // ⚡ POWER — Properly declare a power consumer
     OzoneShieldBlock.hasPower = true;
-    OzoneShieldBlock.consumePower(3); // MUST be called as method
+    OzoneShieldBlock.consumes.power(3); // ✅ correct method
 
     OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
     OzoneShieldBlock.alwaysUnlocked = true;
     OzoneShieldBlock.envEnabled = Env.any;
 
-    // UI Info
     OzoneShieldBlock.localizedName = "Ozone Shield";
     OzoneShieldBlock.description = "Pushes enemies and bullets in a 5x5 area when powered.";
 
