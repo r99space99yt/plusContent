@@ -39,7 +39,6 @@ Events.on(ContentInitEvent, function(){
         })
     });
 
-    // ===== PROPERTIES =====
     OzoneShieldBlock.size = 2;
     OzoneShieldBlock.health = 4000;
     OzoneShieldBlock.category = Category.defense;
@@ -51,17 +50,13 @@ Events.on(ContentInitEvent, function(){
 
     OzoneShieldBlock.buildTime = 120;
 
-    // ⚡ POWER
     OzoneShieldBlock.hasPower = true;
     OzoneShieldBlock.consumePower(3);
 
-    // ✅ Make it placable
     OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
     OzoneShieldBlock.alwaysUnlocked = true;
     OzoneShieldBlock.envEnabled = Env.any;
 
-    // Optional: preview and info
     OzoneShieldBlock.localizedName = "Ozone Shield";
     OzoneShieldBlock.description = "Pushes enemies in a 4x4 square when powered.";
-    OzoneShieldBlock.drawPlace = true;
 });
