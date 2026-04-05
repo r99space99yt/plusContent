@@ -3,13 +3,11 @@ var OzoneShieldBlock;
 Events.on(ContentInitEvent, function(){
 
     OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
-
-        size: 3, // 3x3 block
+        size: 3,
         health: 4000,
         category: Category.defense,
         buildTime: 120,
         hasPower: true,
-        consumePower: 5,
         alwaysUnlocked: true,
         envEnabled: Env.any,
 
@@ -31,11 +29,11 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
-                // 5x5 tiles, convert to pixels
-                var shieldRadius = 5;
-                var centerX = cx*8 + 12; // center of 3x3
+                // center of 3x3 block in pixels
+                var centerX = cx*8 + 12;
                 var centerY = cy*8 + 12;
 
+                var shieldRadius = 5; // in tiles
                 var pushStrength = 1.2;
                 var maxSpeed = 300;
 
@@ -96,7 +94,6 @@ Events.on(ContentInitEvent, function(){
                 );
             },
 
-            // Draw shield visual
             draw(){
                 this.super$draw();
                 if(this.power && this.power.status > 0.0001){
@@ -109,7 +106,6 @@ Events.on(ContentInitEvent, function(){
                 }
             },
 
-            // Placement check for 3x3
             canPlaceOn(tile){
                 for(var dx=0; dx<this.block.size; dx++){
                     for(var dy=0; dy<this.block.size; dy++){
@@ -119,6 +115,10 @@ Events.on(ContentInitEvent, function(){
                 }
                 return true;
             }
+
         })
     });
+
+    // Properly call consumePower method
+    OzoneShieldBlock.consumePower(5);
 });
