@@ -4,8 +4,8 @@ Events.on(ContentInitEvent, function(){
 
     OzoneShieldBlock = extend(Block, "pluscontent-ozone-shield", {
 
-        size: 2,               // 2x2 tiles
-        originOffset: 0,       // top-left corner anchor
+        size: 3,            // 3x3 block → placement works naturally
+        originOffset: 0,    // top-left of 3x3 tile grid
 
         buildType: () => extend(Block.Build, {
 
@@ -17,23 +17,22 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
-                // 4x4 push area
-                var shieldSize = 4;
-                var startX = cx - 1;
-                var startY = cy - 1;
+                var shieldSize = 5;  // 5x5 push area
+                var startX = cx - Math.floor(shieldSize / 2);
+                var startY = cy - Math.floor(shieldSize / 2);
                 var endX = startX + shieldSize;
                 var endY = startY + shieldSize;
 
-                Units.near(cx*8, cy*8, 32, function(u){
+                Units.near(cx*8, cy*8, 40, function(u){
                     var ux = u.x / 8;
                     var uy = u.y / 8;
 
                     if(ux >= startX && ux <= endX && uy >= startY && uy <= endY){
-                        var dx = u.x - (cx*8 + 8);
-                        var dy = u.y - (cy*8 + 8);
+                        var dx = u.x - (cx*8 + 12); // +12 for 3x3 center
+                        var dy = u.y - (cy*8 + 12);
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         if(dist > 0){
-                            var push = 0.2;
+                            var push = 0.25;
                             u.vel.x += dx / dist * push;
                             u.vel.y += dy / dist * push;
                         }
@@ -49,13 +48,7 @@ Events.on(ContentInitEvent, function(){
                     }
                 }
                 return true;
-            },
-
-            // optional: shift drawing to match 2x2 tiles
-            draw(){
-                Draw.rect(this.block.region, this.x + 1, this.y + 1); // +1 shifts sprite to top-left
             }
-
         })
     });
 
@@ -63,19 +56,19 @@ Events.on(ContentInitEvent, function(){
     OzoneShieldBlock.category = Category.defense;
 
     OzoneShieldBlock.requirements = ItemStack.with(
-        Items.copper, 150,
-        Items.lead, 100
+        Items.copper, 200,
+        Items.lead, 150
     );
 
     OzoneShieldBlock.buildTime = 120;
 
     OzoneShieldBlock.hasPower = true;
-    OzoneShieldBlock.consumePower(3);
+    OzoneShieldBlock.consumePower(5);
 
     OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
     OzoneShieldBlock.alwaysUnlocked = true;
     OzoneShieldBlock.envEnabled = Env.any;
 
     OzoneShieldBlock.localizedName = "Ozone Shield";
-    OzoneShieldBlock.description = "Pushes enemies in a 4x4 square when powered.";
+    OzoneShieldBlock.description = "Pushes enemies in a 5x5 square when powered.";
 });
