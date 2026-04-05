@@ -2,23 +2,21 @@
 
 print("Ozone Shield Block Script Started");
 
-var OzoneShieldBlock;
-
+// ozoneWall.js - Fixed and safe for Mindustry 156.2
 Events.on(ContentInitEvent, function() {
 
-    // Create the power block
-    OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
+    var OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
         buildType: function() {
             return extend(PowerBlock.PowerBuild, {
                 updateTile: function() {
                     this.super$updateTile();
-                    // Push handled in separate script
+                    // push handled in separate push script
                 }
             });
         }
     });
 
-    // Block properties
+    // --- Properties ---
     OzoneShieldBlock.size = 3;
     OzoneShieldBlock.health = 4000;
     OzoneShieldBlock.category = Category.defense;
@@ -34,11 +32,12 @@ Events.on(ContentInitEvent, function() {
     OzoneShieldBlock.localizedName = "Ozone Shield";
     OzoneShieldBlock.description = "Pushes units and bullets in a 5x5 area when powered.";
 
-    // --- Proper consumes setup ---
+    // --- Safe consumes declaration ---
     OzoneShieldBlock.hasPower = true;
-
-    // This is the safe place to declare consumes
-    OzoneShieldBlock.consumes.power(3);
+    OzoneShieldBlock.init = function() {
+        this.super$init();
+        this.consumes.power(3);
+    };
 
     print("Ozone Shield Block Initialized Properly");
 });
