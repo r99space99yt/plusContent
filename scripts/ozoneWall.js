@@ -2,43 +2,30 @@
 
 print("Ozone Shield Block Script Started");
 
-// ozoneWall.js - Safe, won’t crash
-Events.on(ContentInitEvent, function() {
+// ozoneWall.js
+const OzoneShieldBlock = extend(PowerBlock, "ozone-shield", {
+    // Build type defines the behavior of each placed block
+    buildType: function () {
+        return extend(PowerBlock.PowerBuild, {
+            updateTile: function () {
+                this.super$updateTile();
 
-    var OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
-        buildType: function() {
-            return extend(PowerBlock.PowerBuild, {
-                updateTile: function() {
-                    this.super$updateTile();
-
-                    // Example: only push if powered
-                    if(this.power.status > 0){
-                        // push logic handled separately
-                        // can call pushUnits(this.x, this.y, 5) or similar
-                    }
+                // Only push if block has power
+                if (this.power.status > 0) {
+                    // Call the separate push logic
+                    OzonePushLogic.push(this);
                 }
-            });
-        }
-    });
+            }
+        });
+    },
 
-    // --- Basic properties ---
-    OzoneShieldBlock.size = 3;
-    OzoneShieldBlock.health = 4000;
-    OzoneShieldBlock.category = Category.defense;
-    OzoneShieldBlock.requirements = ItemStack.with(
-        Items.copper, 150,
-        Items.lead, 100
-    );
-    OzoneShieldBlock.buildTime = 120;
-    OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
-    OzoneShieldBlock.alwaysUnlocked = true;
-    OzoneShieldBlock.envEnabled = Env.any;
+    // Set block stats
+    health: 600,
+    size: 2,
+    requirements: ItemStack.with(Items.copper, 50, Items.graphite, 30),
+    category: Category.effect,
+    buildVisibility: BuildVisibility.shown,
 
-    OzoneShieldBlock.localizedName = "Ozone Shield";
-    OzoneShieldBlock.description = "Pushes units and bullets in a 5x5 area when powered.";
-
-    // --- Correct way to add power consumption ---
-    OzoneShieldBlock.consumes.power(3);
-
-    print("Ozone Shield Block Initialized Properly");
+    // Proper way to declare power consumption
+    consumes: [Consume.power(3)]
 });
