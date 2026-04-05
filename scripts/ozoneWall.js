@@ -1,10 +1,10 @@
-var OzoneBlock;
+var OzoneShieldBlock;
 
 Events.on(ContentInitEvent, function(){
 
-    OzoneBlock = extend(Wall, "pluscontent-ozone-block", {
+    OzoneShieldBlock = extend(Block, "pluscontent-ozone-shield", {
 
-        buildType: () => extend(Wall.WallBuild, {
+        buildType: () => extend(Block.Build, {
 
             updateTile(){
                 this.super$updateTile();
@@ -40,24 +40,28 @@ Events.on(ContentInitEvent, function(){
     });
 
     // ===== PROPERTIES =====
-    OzoneBlock.size = 2;
-    OzoneBlock.health = 4000;
-    OzoneBlock.category = Category.defense;
+    OzoneShieldBlock.size = 2;
+    OzoneShieldBlock.health = 4000;
+    OzoneShieldBlock.category = Category.defense;
 
-    OzoneBlock.requirements = ItemStack.with(
+    OzoneShieldBlock.requirements = ItemStack.with(
         Items.copper, 150,
         Items.lead, 100
     );
 
-    OzoneBlock.buildTime = 120;
+    OzoneShieldBlock.buildTime = 120;
 
     // ⚡ POWER
-    OzoneBlock.hasPower = true;
-    OzoneBlock.consumePower(3);
+    OzoneShieldBlock.hasPower = true;
+    OzoneShieldBlock.consumePower(3);
 
-    // ✅ Make it placable anywhere
-    OzoneBlock.buildVisibility = BuildVisibility.shown;
-    OzoneBlock.alwaysUnlocked = true;
-    OzoneBlock.envEnabled = Env.any; // THIS is important
-    print("Loaded wall");
+    // ✅ Make it placable
+    OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
+    OzoneShieldBlock.alwaysUnlocked = true;
+    OzoneShieldBlock.envEnabled = Env.any;
+
+    // Optional: preview and info
+    OzoneShieldBlock.localizedName = "Ozone Shield";
+    OzoneShieldBlock.description = "Pushes enemies in a 4x4 square when powered.";
+    OzoneShieldBlock.drawPlace = true;
 });
