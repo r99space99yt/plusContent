@@ -4,6 +4,8 @@ Events.on(ContentInitEvent, function(){
 
     OzoneShieldBlock = extend(Block, "pluscontent-ozone-shield", {
 
+        originOffset: 0, // fixes 2x2 placement offset
+
         buildType: () => extend(Block.Build, {
 
             updateTile(){
@@ -14,6 +16,7 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
+                // 4x4 shield area around block
                 var shieldSize = 4;
                 var startX = cx - 1;
                 var startY = cy - 1;
@@ -37,9 +40,8 @@ Events.on(ContentInitEvent, function(){
                 });
             },
 
-            // ✅ Explicitly allow placement anywhere for 2x2 blocks
+            // explicit placement check for 2x2 top-left anchor
             canPlaceOn(tile){
-                // ignore terrain, just check if tiles are empty
                 for(var dx = 0; dx < this.block.size; dx++){
                     for(var dy = 0; dy < this.block.size; dy++){
                         var t = Vars.world.tile(this.tile.x + dx, this.tile.y + dy);
