@@ -1,79 +1,79 @@
 require('ozoneWall');
+// OzoneShieldPush.js — Push units & bullets from powered Ozone Shield
 print("Ozone Shield Push Script Started");
 
-// Utility wrapper for Mindustry JS
-function cons(func){
-    return func;
-}
+function setupOzonePushLoop() {
 
-// Main loop
-function setupOzoneShieldPush(){
-    Time.runTask(0, function loop(){
+    Time.runTask(0, function pushLoop() {
 
-        // --- Push units ---
-        Groups.unit.each(cons(function(u){
-            if(!u || u.dead) return;
+        // Iterate all placed Ozone Shield blocks
+        Groups.build.each(function(b){
 
-            Groups.build.each(cons(function(b){
-                if(!(b.block instanceof PowerBlock)) return;
-                if(b.block.name !== "pluscontent-ozone-shield") return;
-                if(!b.power || b.power.status <= 0.0001) return;
+            // Safety: skip if not our block or no buildType yet
+            if(!b || !b.block || b.block.name !== "pluscontent-ozone-shield") return;
 
-                // Shield center in pixels
-                var cx = b.x * 8 + (b.block.size * 8) / 2;
-                var cy = b.y * 8 + (b.block.size * 8) / 2;
+            // Only active if block has power
+            if(!b.power || b.power.status <= 0.0001) return;
 
-                var radius = 5 * 8; // 5x5 shield effect
-                var dx = u.x - cx;
-                var dy = u.y - cy;
-                var dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist > radius || dist < 1) return;
+            var cx = b.x;  // block center x
+            var cy = b.y;  // block center y
 
-                // Push
-                var nx = dx / dist;
-                var ny = dy / dist;
-                var push = 2.5; // noticeable push
-                u.vel.x += nx * push;
-                u.vel.y += ny * push;
-            }));
-        }));
+            // 5x5 shield area
+            var shieldRadius = 5; // tiles
+            var pixelRadius = shieldRadius * Vars.tilesize; // convert to world units
 
-        // --- Push bullets ---
-        Groups.bullet.each(cons(function(b){
-            if(!b) return;
+            // --- Push units ---
+            Groups.unit.intersect(
+                cx*8 - pixelRadius, cy*8 - pixelRadius,
+                pixelRadius*2, pixelRadius*2,
+                function(u){
+                    if(!u || u.dead) return;
 
-            Groups.build.each(cons(function(bld){
-                if(!(bld.block instanceof PowerBlock)) return;
-                if(bld.block.name !== "pluscontent-ozone-shield") return;
-                if(!bld.power || bld.power.status <= 0.0001) return;
+                    // dx/dy from block center
+                    var dx = u.x - (cx*8 + 8*1.5); // center of 3x3 block in pixels
+                    var dy = u.y - (cy*8 + 8*1.5);
+                    var dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 1) return;
 
-                var cx = bld.x * 8 + (bld.block.size * 8) / 2;
-                var cy = bld.y * 8 + (bld.block.size * 8) / 2;
+                    // push strength proportional
+                    var push = 0.2;
+                    u.vel.x += dx / dist * push;
+                    u.vel.y += dy / dist * push;
+                }
+            );
 
-                var radius = 5 * 8;
-                var dx = b.x - cx;
-                var dy = b.y - cy;
-                var dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist > radius || dist < 1) return;
+            // --- Push bullets ---
+            Groups.bullet.intersect(
+                cx*8 - pixelRadius, cy*8 - pixelRadius,
+                pixelRadius*2, pixelRadius*2,
+                function(bullet){
+                    if(!bullet) return;
 
-                var nx = dx / dist;
-                var ny = dy / dist;
-                var push = 1.8; // slightly weaker for bullets
-                b.vel.x += nx * push;
-                b.vel.y += ny * push;
-            }));
-        }));
+                    var dx = bullet.x - (cx*8 + 8*1.5);
+                    var dy = bullet.y - (cy*8 + 8*1.5);
+                    var dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < 1) return;
 
-        // Loop again next frame
-        Time.runTask(0, loop);
+                    var push = 0.3;
+                    bullet.vel.x += dx / dist * push;
+                    bullet.vel.y += dy / dist * push;
+                }
+            );
+
+        });
+
+        // Loop every frame
+        Time.runTask(0, pushLoop);
     });
+
+    print("Ozone Shield Push Loop Initialized");
 }
 
-// Start after world loaded
-if(Vars.world){
-    setupOzoneShieldPush();
-}else{
-    Events.on(WorldLoadEvent, cons(function(){
-        setupOzoneShieldPush();
-    }));
+// Initialize on world load
+if(Vars.world) {
+    setupOzonePushLoop();
+} else {
+    Events.on(WorldLoadEvent, function(){
+        setupOzonePushLoop();
+    });
 }
