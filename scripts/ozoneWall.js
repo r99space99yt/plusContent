@@ -2,16 +2,19 @@ var OzoneShieldBlock;
 
 Events.on(ContentInitEvent, function(){
 
-    OzoneShieldBlock = extend(Block, "pluscontent-ozone-shield", {
+    // Extend PowerBlock to have normal power UI
+    OzoneShieldBlock = extend(PowerBlock, "pluscontent-ozone-shield", {
 
-        size: 3,
-        originOffset: 0,
-        solid: true,
-        breakable: true,
-        hasPower: true,
+        size: 3,             // 3x3 block
+        originOffset: 0,     // top-left anchor
+        solid: true,         // occupies tiles
+        breakable: true,     // can be destroyed
+        hasPower: true,      // uses power
+        consumesPower: true, // signals it's a power consumer
 
-        buildType: () => extend(Block.Build, {
+        buildType: () => extend(PowerBlock.PowerBuild, {
 
+            // Push units only when powered
             updateTile(){
                 this.super$updateTile();
                 if(!this.power || this.power.status <= 0.0001) return;
@@ -19,7 +22,7 @@ Events.on(ContentInitEvent, function(){
                 var cx = this.x;
                 var cy = this.y;
 
-                var shieldSize = 5; // push 5x5
+                var shieldSize = 5; // 5x5 push area
                 var startX = cx - Math.floor(shieldSize/2);
                 var startY = cy - Math.floor(shieldSize/2);
                 var endX = startX + shieldSize;
@@ -30,7 +33,7 @@ Events.on(ContentInitEvent, function(){
                     var uy = u.y / 8;
 
                     if(ux >= startX && ux <= endX && uy >= startY && uy <= endY){
-                        var dx = u.x - (cx*8 + 12);
+                        var dx = u.x - (cx*8 + 12); // 12 = center of 3x3
                         var dy = u.y - (cy*8 + 12);
                         var dist = Math.sqrt(dx*dx + dy*dy);
                         if(dist > 0){
@@ -42,6 +45,7 @@ Events.on(ContentInitEvent, function(){
                 });
             },
 
+            // Placement check for 3x3
             canPlaceOn(tile){
                 for(var dx=0; dx<this.block.size; dx++){
                     for(var dy=0; dy<this.block.size; dy++){
@@ -52,6 +56,7 @@ Events.on(ContentInitEvent, function(){
                 return true;
             },
 
+            // Draw shield visual when powered
             draw(){
                 this.super$draw();
                 if(this.power && this.power.status > 0.0001){
@@ -67,10 +72,12 @@ Events.on(ContentInitEvent, function(){
         })
     });
 
+    // Block properties
     OzoneShieldBlock.health = 4000;
     OzoneShieldBlock.category = Category.defense;
     OzoneShieldBlock.requirements = ItemStack.with(Items.copper, 200, Items.lead, 150);
     OzoneShieldBlock.buildTime = 120;
+    OzoneShieldBlock.consumePower(5);      // 5 power/tick
     OzoneShieldBlock.buildVisibility = BuildVisibility.shown;
     OzoneShieldBlock.alwaysUnlocked = true;
     OzoneShieldBlock.envEnabled = Env.any;
