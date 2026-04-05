@@ -35,6 +35,18 @@ Events.on(ContentInitEvent, function(){
                         }
                     }
                 });
+            },
+
+            // ✅ Explicitly allow placement anywhere for 2x2 blocks
+            canPlaceOn(tile){
+                // ignore terrain, just check if tiles are empty
+                for(var dx = 0; dx < this.block.size; dx++){
+                    for(var dy = 0; dy < this.block.size; dy++){
+                        var t = Vars.world.tile(this.tile.x + dx, this.tile.y + dy);
+                        if(!t || t.block() != Blocks.air) return false;
+                    }
+                }
+                return true;
             }
         })
     });
